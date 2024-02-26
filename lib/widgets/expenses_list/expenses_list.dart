@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:expanse_tracker/models/expanse.dart';
 import 'package:expanse_tracker/widgets/expenses_list/expense_item.dart';
 import 'package:flutter/material.dart';

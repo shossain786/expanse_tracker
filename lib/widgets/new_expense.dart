@@ -1,8 +1,11 @@
 import 'package:expanse_tracker/models/expanse.dart';
+import 'package:expanse_tracker/widgets/expenses.dart';
 import 'package:flutter/material.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+
+  final void Function(Expanse expenses) onAddExpense;
 
   @override
   State<NewExpense> createState() => _NewExpenseState();
@@ -17,6 +20,7 @@ class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _expenseController = TextEditingController();
   DateTime? _selectedDateTime;
+  Categories _categorySelected = Categories.food;
 
   void _presentDatePicker() async {
     final now = DateTime.now();
@@ -37,6 +41,49 @@ class _NewExpenseState extends State<NewExpense> {
     _titleController.dispose();
     _expenseController.dispose();
     super.dispose();
+  }
+
+  void _submitExpenseData() {
+    // final enteredAmount = double.parse(_expenseController.toString());
+    final enteredAmount = double.tryParse(_expenseController.text);
+    bool invalidAmount = false;
+    if (enteredAmount != null) {
+      invalidAmount = enteredAmount <= 0;
+    }
+
+    if (_titleController.text.trim().isEmpty ||
+        enteredAmount == null ||
+        invalidAmount ||
+        _selectedDateTime == null) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Invlid Input!'),
+          content: const Text(
+            'Please make sure to enter valid data in title, amount and date fields.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    widget.onAddExpense(
+      Expanse(
+        amount: double.parse(_expenseController.text),
+        category: _categorySelected,
+        date: _selectedDateTime!,
+        title: _titleController.text,
+      ),
+    );
+    Navigator.pop(context);
   }
 
   @override
@@ -85,17 +132,39 @@ class _NewExpenseState extends State<NewExpense> {
               ),
             ],
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
+              DropdownButton(
+                value: _categorySelected,
+                items: Categories.values
+                    .map(
+                      (item) => DropdownMenuItem(
+                        value: item,
+                        child: Text(
+                          item.name.toUpperCase(),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  // debugPrint(value.toString());
+                  if (value == null) return;
+                  setState(() {
+                    _categorySelected = value;
+                  });
+                },
+              ),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: const Text('Cancel'),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 6),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _submitExpenseData,
                 child: const Text('Save Expenses'),
               ),
             ],

@@ -3,14 +3,14 @@ import 'package:expanse_tracker/models/expanse.dart';
 import 'package:expanse_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
 
-class Expenses extends StatefulWidget {
-  const Expenses({super.key});
+class Expense extends StatefulWidget {
+  const Expense({super.key});
 
   @override
-  State<Expenses> createState() => _ExpensesState();
+  State<Expense> createState() => _ExpensesState();
 }
 
-class _ExpensesState extends State<Expenses> {
+class _ExpensesState extends State<Expense> {
   final List<Expanse> _registeredExpanses = [
     Expanse(
       title: 'Flutter Course',
@@ -29,8 +29,14 @@ class _ExpensesState extends State<Expenses> {
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => const NewExpense(),
+      builder: (ctx) => NewExpense(onAddExpense: addExpense),
     );
+  }
+
+  void addExpense(Expanse expense) {
+    setState(() {
+      _registeredExpanses.add(expense);
+    });
   }
 
   @override

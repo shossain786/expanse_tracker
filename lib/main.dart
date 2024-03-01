@@ -5,7 +5,7 @@ void main() {
   runApp(
     MaterialApp(
       theme: ThemeData(useMaterial3: true),
-      home: const Expenses(),
+      home: const Expense(),
     ),
   );
 }
